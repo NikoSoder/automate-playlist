@@ -1,4 +1,4 @@
-import { AUTH_URL } from "./info";
+import { AUTH_URL } from "./spotifyConfig";
 
 const SpotifyAuthLink = () => {
   return (
