@@ -93,6 +93,9 @@ export async function getCurrentPlaylists(accessToken: string) {
       id: playlist.id,
       uri: playlist.uri,
       description: playlist.description,
+      owner: playlist.owner.display_name,
+      type: playlist.type,
+      image: playlist.images?.[0]?.url ?? null,
     }));
     console.log(cleanData);
     return cleanData;

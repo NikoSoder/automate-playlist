@@ -8,7 +8,7 @@ import { Playlists } from "./Playlist";
 function App() {
   const code = getCode();
   return (
-    <main className="container mx-auto">
+    <main className="container mx-auto p-2">
       {code ? <Content /> : <SpotifyAuthLink />}
     </main>
   );

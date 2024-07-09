@@ -3,4 +3,7 @@ export interface TPLaylist {
   id: string;
   uri: string;
   description: string;
+  owner: string;
+  type: string;
+  image: string | null;
 }
