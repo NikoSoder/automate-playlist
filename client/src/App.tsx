@@ -7,6 +7,7 @@ import { Playlists } from "./Playlist";
 
 function App() {
   const code = getCode();
+
   return (
     <main className="container mx-auto p-2">
       {code ? <Content /> : <SpotifyAuthLink />}
@@ -15,32 +16,45 @@ function App() {
 }
 
 function Content() {
-  const [token, setToken] = useState<string | null>(null);
   const [userPlaylists, setUserPlaylist] = useState<TPLaylist[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // FIX: add clean up function. race conditions
-    // https://react.dev/reference/react/useEffect
+    let ignore = false;
+
     async function fetchToken() {
       const accessTokenLocalStorage = localStorage.getItem("access_token");
-      if (accessTokenLocalStorage) {
-        setToken(accessTokenLocalStorage);
+      if (accessTokenLocalStorage && !ignore) {
         const playlists = await getCurrentPlaylists(accessTokenLocalStorage);
         setUserPlaylist(playlists);
+        setLoading(false);
         return;
       }
       const token = await getAccessToken();
 
-      if (token) {
-        setToken(token);
+      if (token && !ignore) {
+        const playlists = await getCurrentPlaylists(token);
+        setUserPlaylist(playlists);
+        setLoading(false);
       }
+
+      setLoading(false);
       history.pushState(null, "", "/");
     }
     fetchToken();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
+
+  if (loading) {
+    return <p>loading....</p>;
+  }
+
   return (
     <>
-      <Playlists accessToken={token} userPlaylists={userPlaylists} />
+      <Playlists userPlaylists={userPlaylists} />
     </>
   );
 }

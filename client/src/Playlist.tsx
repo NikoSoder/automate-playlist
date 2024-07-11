@@ -1,15 +1,14 @@
 import { TPLaylist } from "./types";
 
-export function Playlists({
-  accessToken,
-  userPlaylists,
-}: {
-  accessToken: string | null;
-  userPlaylists: TPLaylist[];
-}) {
-  // {accessToken ? <p className="text-wrap">{accessToken}</p> : <p>No accesstoken</p>}
+export function Playlists({ userPlaylists }: { userPlaylists: TPLaylist[] }) {
+  const accessTokenLocalStorage = localStorage.getItem("access_token");
   return (
     <>
+      {accessTokenLocalStorage ? (
+        <p className="text-wrap">{accessTokenLocalStorage}</p>
+      ) : (
+        <p>No accesstoken</p>
+      )}
       <ul className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {userPlaylists.map((playlist) => (
           <PlaylistItem key={playlist.id} playlist={playlist} />

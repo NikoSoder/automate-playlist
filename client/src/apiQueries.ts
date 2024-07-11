@@ -101,6 +101,9 @@ export async function getCurrentPlaylists(accessToken: string) {
     return cleanData;
   } catch (e) {
     console.log(e);
+    if (e instanceof Error) {
+      console.log(e.message);
+    }
     return [];
   }
 }
