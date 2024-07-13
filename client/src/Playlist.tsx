@@ -1,3 +1,4 @@
+import { socket } from "./socket";
 import { TPLaylist } from "./types";
 import { useState } from "react";
 
@@ -38,8 +39,17 @@ export function Playlists({ userPlaylists }: { userPlaylists: TPLaylist[] }) {
 }
 
 export function PlaylistItem({ playlist }: { playlist: TPLaylist }) {
+  function connect(playlistId: string) {
+    if (!socket.id) {
+      socket.connect();
+    }
+    socket.emit("playlist", playlistId);
+  }
   return (
-    <li className="flex p-3 rounded-md cursor-pointer hover:bg-stone-900">
+    <li
+      onClick={() => connect(playlist.id)}
+      className="flex p-3 rounded-md cursor-pointer hover:bg-stone-900"
+    >
       {playlist.image && (
         <div className="me-4">
           <img
