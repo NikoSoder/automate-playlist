@@ -16,25 +16,33 @@ function App() {
 }
 
 function Content() {
-  const [userPlaylists, setUserPlaylist] = useState<TPLaylist[]>([]);
+  const [userPlaylists, setUserPlaylist] = useState<TPLaylist[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // TODO: this is kinda messy
     let ignore = false;
 
     async function fetchToken() {
       const accessTokenLocalStorage = localStorage.getItem("access_token");
       if (accessTokenLocalStorage && !ignore) {
         const playlists = await getCurrentPlaylists(accessTokenLocalStorage);
-        setUserPlaylist(playlists);
+        if (!playlists.success) {
+          setLoading(false);
+          return;
+        }
+        setUserPlaylist(playlists.value);
         setLoading(false);
         return;
       }
+      // FIX: this is giving errors sometimes after auth
       const token = await getAccessToken();
 
-      if (token && !ignore) {
-        const playlists = await getCurrentPlaylists(token);
-        setUserPlaylist(playlists);
+      if (token.success && !ignore) {
+        const playlists = await getCurrentPlaylists(token.value);
+        if (playlists.success) {
+          setUserPlaylist(playlists.value);
+        }
         setLoading(false);
       }
 
@@ -54,7 +62,11 @@ function Content() {
 
   return (
     <>
-      <Playlists userPlaylists={userPlaylists} />
+      {userPlaylists ? (
+        <Playlists userPlaylists={userPlaylists} />
+      ) : (
+        <p>No playlists found</p>
+      )}
     </>
   );
 }

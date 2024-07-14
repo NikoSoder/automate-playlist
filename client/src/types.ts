@@ -7,3 +7,7 @@ export interface TPLaylist {
   type: string;
   image: string | null;
 }
+
+type ResultSuccess<T> = { success: true; value: T };
+type ResultError<E> = { success: false; error: E };
+export type Result<T, E> = ResultSuccess<T> | ResultError<E>;

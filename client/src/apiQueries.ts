@@ -1,7 +1,7 @@
 import { REDIRECT_URI } from "./spotifyConfig";
-import { TPLaylist } from "./types";
+import { TPLaylist, Result } from "./types";
 
-export async function getRefreshToken() {
+export async function getRefreshToken(): Promise<Result<boolean, string>> {
   const url = "https://accounts.spotify.com/api/token";
   try {
     const refreshToken = localStorage.getItem("refresh_token");
@@ -27,12 +27,15 @@ export async function getRefreshToken() {
 
     localStorage.setItem("access_token", response.accessToken);
     localStorage.setItem("refresh_token", response.refreshToken);
+
+    return { success: true, value: true };
   } catch (e) {
     console.log(e);
+    return { success: false, error: "Error in getRefreshToken (catch)" };
   }
 }
 
-export async function getAccessToken() {
+export async function getAccessToken(): Promise<Result<string, string>> {
   try {
     let code = localStorage.getItem("code");
     if (!code) {
@@ -67,14 +70,16 @@ export async function getAccessToken() {
     localStorage.setItem("access_token", data.access_token);
     localStorage.setItem("refresh_token", data.refresh_token);
 
-    return data.access_token;
+    return { success: true, value: data.access_token };
   } catch (e) {
     console.log(e);
-    return null;
+    return { success: false, error: "Error in getAccessToken (catch)" };
   }
 }
 
-export async function getCurrentPlaylists(accessToken: string) {
+export async function getCurrentPlaylists(
+  accessToken: string,
+): Promise<Result<TPLaylist[], string>> {
   try {
     const response = await fetch("https://api.spotify.com/v1/me/playlists", {
       headers: {
@@ -98,12 +103,13 @@ export async function getCurrentPlaylists(accessToken: string) {
       image: playlist.images?.[0]?.url ?? null,
     }));
     console.log(cleanData);
-    return cleanData;
+
+    return { success: true, value: cleanData };
   } catch (e) {
     console.log(e);
     if (e instanceof Error) {
       console.log(e.message);
     }
-    return [];
+    return { success: false, error: "Error in getCurrentPlaylists (catch)" };
   }
 }
