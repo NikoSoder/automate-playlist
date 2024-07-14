@@ -39,11 +39,12 @@ export function Playlists({ userPlaylists }: { userPlaylists: TPLaylist[] }) {
 }
 
 export function PlaylistItem({ playlist }: { playlist: TPLaylist }) {
+  const accessTokenLocalStorage = localStorage.getItem("access_token");
   function connect(playlistId: string) {
     if (!socket.id) {
       socket.connect();
     }
-    socket.emit("playlist", playlistId);
+    socket.emit("playlist", { playlistId, accessTokenLocalStorage });
   }
   return (
     <li>
