@@ -44,7 +44,6 @@ io.on("connection", (socket) => {
       // TODO: do something here if error
       return;
     }
-    // TODO: send song data to client
     socket.emit("onSongPlay", song);
   });
 });

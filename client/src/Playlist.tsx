@@ -3,7 +3,6 @@ import { TPLaylist } from "./types";
 import { useState } from "react";
 
 export function Playlists({ userPlaylists }: { userPlaylists: TPLaylist[] }) {
-  const accessTokenLocalStorage = localStorage.getItem("access_token");
   const [query, setQuery] = useState("");
 
   const filteredPlaylists = userPlaylists.filter((playlist) => {
@@ -15,11 +14,6 @@ export function Playlists({ userPlaylists }: { userPlaylists: TPLaylist[] }) {
 
   return (
     <>
-      {accessTokenLocalStorage ? (
-        <p className="text-wrap">{accessTokenLocalStorage}</p>
-      ) : (
-        <p>No accesstoken</p>
-      )}
       <div className="max-w-sm">
         <input
           type="text"

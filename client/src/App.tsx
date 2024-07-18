@@ -19,6 +19,7 @@ function App() {
 function Content() {
   const [userPlaylists, setUserPlaylist] = useState<TPLaylist[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     // TODO: this is kinda messy
@@ -63,12 +64,10 @@ function Content() {
 
   return (
     <>
-      {userPlaylists ? (
+      <OnListening setIsListening={setIsListening} />
+      {userPlaylists && !isListening ? (
         <Playlists userPlaylists={userPlaylists} />
-      ) : (
-        <p>No playlists found</p>
-      )}
-      <OnListening />
+      ) : null}
     </>
   );
 }
