@@ -4,6 +4,7 @@ import SpotifyAuthLink from "./SpotifyLink";
 import { getAccessToken, getCurrentPlaylists } from "./apiQueries";
 import { TPLaylist } from "./types";
 import { Playlists } from "./Playlist";
+import OnListening from "./onListening";
 
 function App() {
   const code = getCode();
@@ -67,6 +68,7 @@ function Content() {
       ) : (
         <p>No playlists found</p>
       )}
+      <OnListening />
     </>
   );
 }
