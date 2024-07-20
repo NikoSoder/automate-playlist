@@ -25,7 +25,8 @@ function OnListening({ setIsListening }: OnListeningProps) {
   }
 
   return (
-    <div className="max-w-sm bg-gradient-to-l from-stone-950 to-stone-900 p-3 flex gap-4 rounded-md">
+    <div className="max-w-sm bg-stone-900 p-3 flex gap-4 rounded-md">
+      {/*TODO: add small animation when song changes*/}
       <img
         className="rounded-md"
         src={nowPlayingSong.images[2].url}

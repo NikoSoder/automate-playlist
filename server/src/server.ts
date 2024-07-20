@@ -3,8 +3,10 @@ import morgan from "morgan";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { PlaylistSocketData } from "./types";
-import { getCurrentlyPlayingTrack, addSongToPlaylist } from "./api";
+import { updatePlaylist } from "./update";
 
+const FETCH_SONG_INTERVAL_TIME = 30000; // 30s
+const previousSongs: string[] = []; // store song uris
 const port = 6969;
 const app = express();
 const server = createServer(app);
@@ -24,27 +26,16 @@ io.listen(4000);
 io.on("connection", (socket) => {
   console.log("User connected");
 
-  socket.on("playlist", async (data: PlaylistSocketData) => {
-    // TODO: add interval to check currently playing track
-    const song = await getCurrentlyPlayingTrack(data.accessTokenLocalStorage);
-    if (!song.success) {
-      console.log(song.error);
-      // TODO: do something here if error
-      return;
-    }
+  socket.on("playlist", (data: PlaylistSocketData) => {
+    updatePlaylist(data, socket, previousSongs); // run this first because setInterval starts after 30s
 
-    const songToPlaylist = await addSongToPlaylist(
-      data.accessTokenLocalStorage,
-      data.playlistId,
-      song.value.uri,
+    setInterval(
+      updatePlaylist,
+      FETCH_SONG_INTERVAL_TIME,
+      data,
+      socket,
+      previousSongs,
     );
-
-    if (!songToPlaylist.success) {
-      console.log(songToPlaylist.error);
-      // TODO: do something here if error
-      return;
-    }
-    socket.emit("onSongPlay", song);
   });
 });
 
