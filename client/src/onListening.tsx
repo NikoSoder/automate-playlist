@@ -25,8 +25,10 @@ function OnListening({ setIsListening }: OnListeningProps) {
   }
 
   return (
-    <div className="max-w-sm bg-stone-900 p-3 flex gap-4 rounded-md">
-      {/*TODO: add small animation when song changes*/}
+    <div
+      key={nowPlayingSong.uri}
+      className="max-w-sm bg-stone-900 p-3 flex gap-4 rounded-md animate-fadeIn"
+    >
       <img
         className="rounded-md"
         src={nowPlayingSong.images[2].url}
@@ -35,8 +37,9 @@ function OnListening({ setIsListening }: OnListeningProps) {
       <div className="grow flex justify-between">
         <div>
           <p className="text-white">{nowPlayingSong.trackName}</p>
-          {/*TODO: loop through all artists*/}
-          <p className="text-stone-400">{nowPlayingSong.artistNames[0]}</p>
+          <p className="text-stone-400">
+            {nowPlayingSong.artistNames.join(", ")}
+          </p>
         </div>
         <span className="relative flex h-3 w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75"></span>
