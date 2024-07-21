@@ -20,6 +20,14 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
                                                redirect_uri=redirect_uri,
                                                scope=scope))
 
+# get playlist tracks to prevent dublicates
+playlist_tracks_info = sp.playlist_tracks(TEST_PLAYLIST_ID)
+# TODO: error handling
+playlist_tracks = playlist_tracks_info['items']
+for track in playlist_tracks:
+    uri = track['track']['uri']
+    previous_songs.append(uri)
+
 while True:
     # get currently playing track
     song = sp.current_user_playing_track()
