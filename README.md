@@ -1,6 +1,5 @@
-Automate songs to spotify playlist
+Automatically add songs to a playlist as you and your friends listen to music on Spotify.
 
 ### TODO:
 
-- [ ] Fetch refreshtoken if accesstoken expires
-- [x] Search input
+- [ ] Update token if accesstoken expires
