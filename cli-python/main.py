@@ -16,10 +16,14 @@ client_secret = os.getenv("CLIENT_SECRET")
 redirect_uri = os.getenv("REDIRECT_URI")
 scope = os.getenv("SCOPE")
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
-                                               client_secret=client_secret,
-                                               redirect_uri=redirect_uri,
-                                               scope=scope))
+sp = spotipy.Spotify(
+    auth_manager=SpotifyOAuth(
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_uri=redirect_uri,
+        scope=scope,
+    )
+)
 
 # get playlist tracks to prevent dublicates
 playlist_tracks_info = sp.playlist_tracks(TEST_PLAYLIST_ID)
@@ -41,7 +45,7 @@ while True:
     artist_names = []
 
     for x in song_artists:
-        artist_names.append(x['name'])
+        artist_names.append(x["name"])
 
     print(artist_names)
     # print(song_uri)
@@ -49,8 +53,8 @@ while True:
     # print(song_artists)
 
     # add song to a selected playlist
-    if(song_uri not in previous_songs):
-        print('adding song to playlist...')
+    if song_uri not in previous_songs:
+        print("adding song to playlist...")
         print(song_uri)
         # TODO: error handling
         snapshot_id = sp.playlist_add_items(TEST_PLAYLIST_ID, [song_uri])
