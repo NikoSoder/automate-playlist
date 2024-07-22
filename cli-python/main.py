@@ -4,12 +4,13 @@ from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 import os
 import time
+import sys
 
 load_dotenv()
 # TODO: how to get playlist id
-TEST_PLAYLIST_ID = "3QfRAHriwRAIpoLJBia6TA"
-CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 30 # 30s
-previous_songs = [] # song uris
+TEST_PLAYLIST_ID = "3NDunacCS4ElOReYC6sEHH"
+CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 90  # 90s
+previous_songs = []  # song uris
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 redirect_uri = os.getenv("REDIRECT_URI")
@@ -22,19 +23,21 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
 
 # get playlist tracks to prevent dublicates
 playlist_tracks_info = sp.playlist_tracks(TEST_PLAYLIST_ID)
-# TODO: error handling
-playlist_tracks = playlist_tracks_info['items']
-for track in playlist_tracks:
-    uri = track['track']['uri']
-    previous_songs.append(uri)
+if playlist_tracks_info:
+    playlist_tracks = playlist_tracks_info["items"]
+    for track in playlist_tracks:
+        uri = track["track"]["uri"]
+        previous_songs.append(uri)
 
 while True:
     # get currently playing track
     song = sp.current_user_playing_track()
-    # TODO: error handling
-    song_uri = song['item']['uri']
-    song_name = song['item']['name']
-    song_artists = song['item']['artists']
+    if not song:
+        sys.exit("No currently playing tracks")
+
+    song_uri = song["item"]["uri"]
+    song_name = song["item"]["name"]
+    song_artists = song["item"]["artists"]
     artist_names = []
 
     for x in song_artists:
@@ -54,4 +57,4 @@ while True:
         print(snapshot_id)
         previous_songs.append(song_uri)
 
-    time.sleep(10)
+    time.sleep(CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME)
