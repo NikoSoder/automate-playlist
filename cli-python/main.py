@@ -11,10 +11,9 @@ import argparse
 parser = argparse.ArgumentParser(description="Spotify playlist id")
 parser.add_argument("spotify_playlist_id", type=str, help="Playlist id")
 args = parser.parse_args()
-playlist_id = args.spotify_playlist_id
+PLAYLIST_ID = args.spotify_playlist_id
 
 load_dotenv()
-PLAYLIST_ID = playlist_id
 CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 90  # 90s
 previous_songs = []  # song uris
 client_id = os.getenv("CLIENT_ID")
@@ -31,14 +30,25 @@ sp = spotipy.Spotify(
     )
 )
 
-# get playlist tracks to prevent dublicates
-# FIX: errors if invalid PLAYLIST_ID
-playlist_tracks_info = sp.playlist_tracks(PLAYLIST_ID)
-if playlist_tracks_info:
-    playlist_tracks = playlist_tracks_info["items"]
-    for track in playlist_tracks:
-        uri = track["track"]["uri"]
-        previous_songs.append(uri)
+try:
+    # get playlist tracks to prevent dublicates
+    playlist_tracks_info = sp.playlist_tracks(PLAYLIST_ID)
+    if playlist_tracks_info:
+        playlist_tracks = playlist_tracks_info["items"]
+        for track in playlist_tracks:
+            uri = track["track"]["uri"]
+            previous_songs.append(uri)
+
+except spotipy.SpotifyException as e:
+    print(f"An error occurred: {e}")
+    print(f"Exception type: {e.__class__.__name__}")
+    print(f"Exception args: {e.args}")
+    sys.exit()
+except Exception as e:
+    print(f"An error occurred: {e}")
+    print(f"Exception type: {e.__class__.__name__}")
+    print(f"Exception args: {e.args}")
+    sys.exit()
 
 while True:
     # get currently playing track
@@ -56,7 +66,7 @@ while True:
 
     print(artist_names)
     # print(song_uri)
-    # print(song_name)
+    print(song_name)
     # print(song_artists)
 
     # add song to a selected playlist
