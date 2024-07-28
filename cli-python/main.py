@@ -50,6 +50,21 @@ except Exception as e:
     print(f"Exception args: {e.args}")
     sys.exit()
 
+
+def print_now_listening(name, artists):
+    name_length = len(name)
+    artists_length = len(", ".join(artists))
+    artists = ", ".join(artists)
+    cols = max(name_length, artists_length) + 5
+    # borders around song info
+    print()
+    print("+" + "-" * (cols) + "+")
+    print(f"| {name}{' ' * (cols - name_length - 2)} |")
+    print(f"| {artists}{' ' * (cols - artists_length - 2)} |")
+    print("+" + "-" * (cols) + "+")
+    print()
+
+
 while True:
     # get currently playing track
     song = sp.current_user_playing_track()
@@ -64,10 +79,7 @@ while True:
     for x in song_artists:
         artist_names.append(x["name"])
 
-    print(artist_names)
-    # print(song_uri)
-    print(song_name)
-    # print(song_artists)
+    print_now_listening(song_name, artist_names)
 
     # add song to a selected playlist
     if song_uri not in previous_songs:
