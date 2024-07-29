@@ -2,7 +2,7 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
-import os
+from os import system, name, getenv
 import time
 import sys
 import argparse
@@ -17,10 +17,10 @@ PLAYLIST_ID = args.spotify_playlist_id
 load_dotenv()
 CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 90  # 90s
 previous_songs = []  # song uris
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
-redirect_uri = os.getenv("REDIRECT_URI")
-scope = os.getenv("SCOPE")
+client_id = getenv("CLIENT_ID")
+client_secret = getenv("CLIENT_SECRET")
+redirect_uri = getenv("REDIRECT_URI")
+scope = getenv("SCOPE")
 
 sp = spotipy.Spotify(
     auth_manager=SpotifyOAuth(
@@ -51,7 +51,19 @@ except Exception as e:
     print(f"Exception args: {e.args}")
     sys.exit()
 
+
+def clear_terminal():
+    # for windows
+    if name == "nt":
+        system("cls")
+        return
+
+    # for mac, linux
+    system("clear")
+
+
 while True:
+    clear_terminal()
     # get currently playing track
     song = sp.current_user_playing_track()
     if not song:
