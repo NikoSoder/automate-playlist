@@ -1,20 +1,18 @@
-def print_border(name, artists):
-    title = "NOW LISTENING"
-    merged_artists = ", ".join(artists)
+def print_border(title: str, *args: str):
     PADDING_RIGHT = 5
-    cols = max(len(name), len(merged_artists), len(title)) + PADDING_RIGHT
+    cols = max(len(arg) for arg in args + (title,)) + PADDING_RIGHT
     # borders around song
     print()
     print_title_middle(title, cols)
     print_emptlyline_with_border(cols)
-    print_word(name, cols)
-    print_word(merged_artists, cols)
+    for arg in args:
+        print_word(arg, cols)
     print_emptlyline_with_border(cols)
     print_corners(cols)
     print()
 
 
-def print_title_middle(title, cols):
+def print_title_middle(title: str, cols: int):
     # NOTE: a lot of magic numbers...
     title_length = len(title)
     padding = round((cols - title_length) / 2) + 1
@@ -22,14 +20,14 @@ def print_title_middle(title, cols):
     print("+" + "-" * (padding) + title + "-" * (padding + extra_padding) + "+")
 
 
-def print_word(word, cols):
+def print_word(word: str, cols: int):
     word_length = len(word)
     print(f"| {word}{' ' * (cols - word_length)} |")
 
 
-def print_corners(cols):
+def print_corners(cols: int):
     print("+" + "-" * (cols) + "-" + "-" + "+")
 
 
-def print_emptlyline_with_border(cols):
+def print_emptlyline_with_border(cols: int):
     print(f"| {' ' * (cols)} |")

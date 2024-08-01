@@ -73,11 +73,13 @@ while True:
     song_name = song["item"]["name"]
     song_artists = song["item"]["artists"]
     artist_names = []
+    title = "NOW LISTENING"
 
     for x in song_artists:
         artist_names.append(x["name"])
+    merged_artists = ", ".join(artist_names)
 
-    print_border(song_name, artist_names)
+    print_border(title, song_name, merged_artists)
 
     # add song to a selected playlist
     if song_uri not in previous_songs:
