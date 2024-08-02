@@ -1,33 +1,43 @@
+CORNER_CHAR_COUNT = 2
+PADDING_RIGHT = 3
+PADDING_LEFT = 3
+
+
 def print_border(title: str, *args: str):
-    PADDING_RIGHT = 5
     cols = max(len(arg) for arg in args + (title,)) + PADDING_RIGHT
     # borders around song
     print()
-    print_title_middle(title, cols)
+    print_title(title, cols)
     print_emptlyline_with_border(cols)
     for arg in args:
         print_word(arg, cols)
     print_emptlyline_with_border(cols)
     print_corners(cols)
     print()
+    return cols
 
 
-def print_title_middle(title: str, cols: int):
-    # NOTE: a lot of magic numbers...
+def print_title(title: str, cols: int):
     title_length = len(title)
-    padding = round((cols - title_length) / 2) + 1
-    extra_padding = (cols - title_length) % 2
-    print("+" + "-" * (padding) + title + "-" * (padding + extra_padding) + "+")
+    content = "+" + "-" * (PADDING_LEFT) + title + "-" * (cols - title_length) + "+"
+    print(content)
+    return len(content)
 
 
 def print_word(word: str, cols: int):
     word_length = len(word)
-    print(f"| {word}{' ' * (cols - word_length)} |")
+    content = f"|{' ' * (PADDING_LEFT) }{word}{' ' * (cols - word_length)}|"
+    print(content)
+    return len(content)
 
 
 def print_corners(cols: int):
-    print("+" + "-" * (cols) + "-" + "-" + "+")
+    content = "+" + "-" * (cols + PADDING_LEFT) + "+"
+    print(content)
+    return len(content)
 
 
 def print_emptlyline_with_border(cols: int):
-    print(f"| {' ' * (cols)} |")
+    content = f"|{' ' * (cols + PADDING_LEFT)}|"
+    print(content)
+    return len(content)
