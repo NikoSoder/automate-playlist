@@ -51,6 +51,38 @@ except Exception as e:
     print(f"Exception args: {e.args}")
     sys.exit()
 
+def animated_music_icon(duration):
+    music_icon = "♫♫♫"
+    width = 3
+    direction = 1
+    position = 0
+    HIDE_CURSOR = "\033[?25l"
+    SHOW_CURSOR = "\033[?25h"
+
+    start_time = time.time()
+
+    while True:
+        current_time = time.time()
+        elapsed_time = current_time - start_time
+
+        if elapsed_time >= duration:
+            break
+
+        line = [" "] * width
+        line[position] = music_icon
+        sys.stdout.write(HIDE_CURSOR)
+        sys.stdout.write("\r" + "".join(line))
+        sys.stdout.flush()
+
+        time.sleep(1)
+
+        position += direction
+        if position == 0 or position == width - 1:
+            direction *= -1
+
+    sys.stdout.write(SHOW_CURSOR)
+    sys.stdout.flush()
+
 
 def clear_terminal():
     # for windows
@@ -90,4 +122,4 @@ while True:
         print(snapshot_id)
         previous_songs.append(song_uri)
 
-    time.sleep(CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME)
+    animated_music_icon(CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME)
