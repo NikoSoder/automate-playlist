@@ -7,6 +7,8 @@ import time
 import sys
 import argparse
 from border import print_border
+from requests.exceptions import ReadTimeout
+from typing import Callable
 
 # get playlist id
 parser = argparse.ArgumentParser(description="Spotify playlist id")
@@ -15,7 +17,7 @@ args = parser.parse_args()
 PLAYLIST_ID = args.spotify_playlist_id
 
 load_dotenv()
-CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 90  # 90s
+CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 60  # 60s
 previous_songs = []  # song uris
 client_id = getenv("CLIENT_ID")
 client_secret = getenv("CLIENT_SECRET")
@@ -28,28 +30,11 @@ sp = spotipy.Spotify(
         client_secret=client_secret,
         redirect_uri=redirect_uri,
         scope=scope,
+        requests_timeout=10,
+        # retries=10
     )
 )
 
-try:
-    # get playlist tracks to prevent dublicates
-    playlist_tracks_info = sp.playlist_tracks(PLAYLIST_ID)
-    if playlist_tracks_info:
-        playlist_tracks = playlist_tracks_info["items"]
-        for track in playlist_tracks:
-            uri = track["track"]["uri"]
-            previous_songs.append(uri)
-
-except spotipy.SpotifyException as e:
-    print(f"An error occurred: {e}")
-    print(f"Exception type: {e.__class__.__name__}")
-    print(f"Exception args: {e.args}")
-    sys.exit()
-except Exception as e:
-    print(f"An error occurred: {e}")
-    print(f"Exception type: {e.__class__.__name__}")
-    print(f"Exception args: {e.args}")
-    sys.exit()
 
 def animated_music_icon(duration):
     music_icon = "♫♫♫"
@@ -84,6 +69,24 @@ def animated_music_icon(duration):
     sys.stdout.flush()
 
 
+def handle_api_call(func: Callable, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except ReadTimeout as e:
+        print("\a")  # NOTE: remove this later(bell sound for debug)
+        print(f"ReadTimeout occurred: {e}")
+        return func(*args, **kwargs)
+    except spotipy.SpotifyException as e:
+        print(f"SpotifyException: {e}")
+        sys.exit()
+    except ConnectionError as e:
+        print(f"ConnectionError: {e}")
+        sys.exit()
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        sys.exit()
+
+
 def clear_terminal():
     # for windows
     if name == "nt":
@@ -94,10 +97,18 @@ def clear_terminal():
     system("clear")
 
 
+playlist_tracks_info = handle_api_call(sp.playlist_tracks, PLAYLIST_ID)
+if playlist_tracks_info:
+    playlist_tracks = playlist_tracks_info["items"]
+    for track in playlist_tracks:
+        uri = track["track"]["uri"]
+        previous_songs.append(uri)
+
+
 while True:
-    clear_terminal()
+    # clear_terminal()
     # get currently playing track
-    song = sp.current_user_playing_track()
+    song = handle_api_call(sp.current_user_playing_track)
     if not song:
         sys.exit("No currently playing tracks")
 
@@ -115,11 +126,8 @@ while True:
 
     # add song to a selected playlist
     if song_uri not in previous_songs:
-        print("adding song to playlist...")
-        print(song_uri)
-        # TODO: error handling
-        snapshot_id = sp.playlist_add_items(PLAYLIST_ID, [song_uri])
-        print(snapshot_id)
+        handle_api_call(sp.playlist_add_items, PLAYLIST_ID, [song_uri])
+        print(f"adding {song_name} to a playlist...")
         previous_songs.append(song_uri)
 
     animated_music_icon(CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME)
