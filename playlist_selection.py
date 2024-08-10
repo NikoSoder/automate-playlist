@@ -1,6 +1,6 @@
 import sys
 from typing import Callable, List, Optional
-from functions import clear_terminal
+from functions import clear_terminal, handle_api_call
 
 
 class Song:
@@ -19,13 +19,11 @@ class Playlist:
         return any(song.uri == song_uri for song in self.songs)
 
 
-def user_select_playlist(
-    api_call: Callable, spotify_api_call: Callable
-) -> Optional[Playlist]:
+def user_select_playlist(spotify_api_call: Callable) -> Optional[Playlist]:
     FETCH_PLAYLISTS_LIMIT = 20
     clear_terminal()
     user_playlists: List[Playlist] = []
-    playlists = api_call(spotify_api_call, FETCH_PLAYLISTS_LIMIT)
+    playlists = handle_api_call(spotify_api_call, FETCH_PLAYLISTS_LIMIT)
     if not playlists:
         sys.exit("No playlists found")
 

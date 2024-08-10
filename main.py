@@ -7,9 +7,7 @@ import time
 import sys
 from border import print_border
 from playlist_selection import user_select_playlist, Song
-from functions import clear_terminal
-from requests.exceptions import ReadTimeout
-from typing import Callable
+from functions import clear_terminal, handle_api_call
 
 load_dotenv()
 CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 60  # 60s
@@ -29,26 +27,8 @@ sp = spotipy.Spotify(
 )
 
 
-def handle_api_call(func: Callable, *args, **kwargs):
-    try:
-        return func(*args, **kwargs)
-    except ReadTimeout as e:
-        print("\a")  # NOTE: remove this later(bell sound for debug)
-        print(f"ReadTimeout occurred: {e}")
-        return func(*args, **kwargs)
-    except spotipy.SpotifyException as e:
-        print(f"SpotifyException: {e}")
-        sys.exit()
-    except ConnectionError as e:
-        print(f"ConnectionError: {e}")
-        sys.exit()
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        sys.exit()
-
-
 # list of playlist to select
-PLAYLIST_ACTIVE = user_select_playlist(handle_api_call, sp.current_user_playlists)
+PLAYLIST_ACTIVE = user_select_playlist(sp.current_user_playlists)
 if not PLAYLIST_ACTIVE:
     sys.exit()
 
