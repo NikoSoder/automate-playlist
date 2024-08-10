@@ -6,8 +6,9 @@ from os import system, name, getenv
 import time
 import sys
 from border import print_border
+from playlist_selection import user_select_playlist
 from requests.exceptions import ReadTimeout
-from typing import Callable, List, Optional
+from typing import Callable
 
 load_dotenv()
 CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 60  # 60s
@@ -57,53 +58,10 @@ def clear_terminal():
     system("clear")
 
 
-class Playlist:
-    def __init__(self, id: str, name: str):
-        self.id = id
-        self.name = name
-        """
-        save playlist songs here aswell?
-        now playlist songs are in 'previous_songs' 
-        """
-
-
-def user_select_playlist() -> Optional[Playlist]:
-    clear_terminal()
-    user_playlists: List[Playlist] = []
-    playlists = handle_api_call(sp.current_user_playlists, 20)
-    if not playlists:
-        sys.exit("No playlists found")
-
-    for idx, playlist in enumerate(playlists["items"]):
-        name = playlist["name"]
-        id = playlist["id"]
-        user_playlists.append(Playlist(id, name))
-        print(f"({idx + 1}), {name}")
-
-    print()
-
-    try:
-        user_selected_playlist_idx = int(
-            input("Select a playlist to save the currently playing songs: ")
-        )
-
-        if user_selected_playlist_idx < 1 or user_selected_playlist_idx > len(
-            user_playlists
-        ):
-            print("Not a valid index")
-            return None
-
-        selected_playlist = user_playlists[user_selected_playlist_idx - 1]
-        return selected_playlist
-    except ValueError as e:
-        print(f"Not a valid number: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-
-    return None
-
-
-PLAYLIST_ACTIVE = user_select_playlist()
+# list of playlist to select
+PLAYLIST_ACTIVE = user_select_playlist(
+    handle_api_call, sp.current_user_playlists, clear_terminal
+)
 if not PLAYLIST_ACTIVE:
     sys.exit()
 
