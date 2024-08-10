@@ -1,19 +1,26 @@
 import sys
 from typing import Callable, List, Optional
+from functions import clear_terminal
+
+
+class Song:
+    def __init__(self, uri: str, name: str):
+        self.uri = uri
+        self.name = name
 
 
 class Playlist:
-    def __init__(self, id: str, name: str):
+    def __init__(self, id: str, name: str, songs: List[Song]):
         self.id = id
         self.name = name
-        """
-        save playlist songs here aswell?
-        now playlist songs are in 'previous_songs' 
-        """
+        self.songs = songs
+
+    def has_song(self, song_uri: str) -> bool:
+        return any(song.uri == song_uri for song in self.songs)
 
 
 def user_select_playlist(
-    api_call: Callable, spotify_api_call: Callable, clear_terminal: Callable
+    api_call: Callable, spotify_api_call: Callable
 ) -> Optional[Playlist]:
     FETCH_PLAYLISTS_LIMIT = 20
     clear_terminal()
@@ -25,7 +32,7 @@ def user_select_playlist(
     for idx, playlist in enumerate(playlists["items"]):
         name = playlist["name"]
         id = playlist["id"]
-        user_playlists.append(Playlist(id, name))
+        user_playlists.append(Playlist(id, name, []))
         print(f"({idx + 1}), {name}")
 
     print()

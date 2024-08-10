@@ -2,17 +2,17 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
-from os import system, name, getenv
+from os import name, getenv
 import time
 import sys
 from border import print_border
-from playlist_selection import user_select_playlist
+from playlist_selection import user_select_playlist, Song
+from functions import clear_terminal
 from requests.exceptions import ReadTimeout
 from typing import Callable
 
 load_dotenv()
 CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME = 60  # 60s
-previous_songs = []  # song uris TODO: move this to Playlist class
 client_id = getenv("CLIENT_ID")
 client_secret = getenv("CLIENT_SECRET")
 redirect_uri = getenv("REDIRECT_URI")
@@ -25,7 +25,6 @@ sp = spotipy.Spotify(
         redirect_uri=redirect_uri,
         scope=scope,
         requests_timeout=10,
-        # retries=10
     )
 )
 
@@ -48,20 +47,8 @@ def handle_api_call(func: Callable, *args, **kwargs):
         sys.exit()
 
 
-def clear_terminal():
-    # for windows
-    if name == "nt":
-        system("cls")
-        return
-
-    # for mac, linux
-    system("clear")
-
-
 # list of playlist to select
-PLAYLIST_ACTIVE = user_select_playlist(
-    handle_api_call, sp.current_user_playlists, clear_terminal
-)
+PLAYLIST_ACTIVE = user_select_playlist(handle_api_call, sp.current_user_playlists)
 if not PLAYLIST_ACTIVE:
     sys.exit()
 
@@ -99,12 +86,15 @@ def animated_music_icon(duration):
     sys.stdout.flush()
 
 
+# add playlist tracks to selected playlist
 playlist_tracks_info = handle_api_call(sp.playlist_tracks, PLAYLIST_ACTIVE.id)
 if playlist_tracks_info:
     playlist_tracks = playlist_tracks_info["items"]
     for track in playlist_tracks:
         uri = track["track"]["uri"]
-        previous_songs.append(uri)
+        name = track["track"]["name"]
+        playlist_song = Song(uri, name)
+        PLAYLIST_ACTIVE.songs.append(playlist_song)
 
 
 while True:
@@ -127,9 +117,9 @@ while True:
     print_border(title, song_name, merged_artists)
 
     # add song to a selected playlist
-    if song_uri not in previous_songs:
+    if not PLAYLIST_ACTIVE.has_song(song_uri):
         handle_api_call(sp.playlist_add_items, PLAYLIST_ACTIVE.id, [song_uri])
         print(f"Adding song: {song_name} to the playlist: {PLAYLIST_ACTIVE.name}")
-        previous_songs.append(song_uri)
+        PLAYLIST_ACTIVE.songs.append(Song(song_uri, song_name))
 
     animated_music_icon(CHECK_CURRENTLY_PLAYING_TRACK_WAIT_TIME)
